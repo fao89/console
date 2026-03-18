@@ -2,20 +2,26 @@ import { compact, uniq } from 'lodash';
 import { getURLSearchParams } from '@console/internal/components/utils/link';
 
 const getEnabledDynamicPluginNames = () => {
-  const allPluginNames = window.SERVER_FLAGS.consolePlugins;
+  const allPluginNames = window.SERVER_FLAGS.consolePlugins || [];
   const disabledPlugins = getURLSearchParams()['disable-plugins'];
+
+  // Development override: Add lightspeed plugin if not present
+  const devPluginNames =
+    process.env.NODE_ENV === 'development' && !allPluginNames.includes('lightspeed-console-plugin')
+      ? [...allPluginNames, 'lightspeed-console-plugin']
+      : allPluginNames;
 
   if (disabledPlugins === '') {
     return [];
   }
 
   if (!disabledPlugins) {
-    return allPluginNames;
+    return devPluginNames;
   }
 
   const disabledPluginNames = compact(disabledPlugins.split(','));
 
-  return uniq(allPluginNames).filter((pluginName) => !disabledPluginNames.includes(pluginName));
+  return uniq(devPluginNames).filter((pluginName) => !disabledPluginNames.includes(pluginName));
 };
 
 /**

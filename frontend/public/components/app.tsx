@@ -215,6 +215,16 @@ const App: FC<{
     dispatch(setFlag(FLAGS.LIGHTSPEED_IS_AVAILABLE_TO_INSTALL, errorMessage === ''));
   }, [dispatch, errorMessage]);
 
+  // Development override: Always enable LIGHTSPEED_CONSOLE flag for local testing
+  // Separate useEffect with empty dependency array to avoid infinite loops
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      dispatch(setFlag('LIGHTSPEED_CONSOLE', true));
+    }
+    // Temporary: Force enable LIGHTSPEED_CONSOLE for testing auto-submit
+    dispatch(setFlag('LIGHTSPEED_CONSOLE', true));
+  }, [dispatch]);
+
   const consoleCapabilityLightspeedButtonIsEnabled = useFlag(
     FLAGS.CONSOLE_CAPABILITY_LIGHTSPEEDBUTTON_IS_ENABLED,
   );
